@@ -107,6 +107,20 @@ define([
       withCredentials: false,
 
       /**
+       * Pre-fetched / local waveform data to build the waveforms with
+       *
+       * Only one source is required
+       *
+       * ```js
+       * rawData: {
+       *   arraybuffer: ArrayBuffer,
+       *   json: Object
+       * }
+       * ```
+       */
+      rawData:               null,
+
+      /**
        * Will report errors to that function
        *
        * @type {Function=}
@@ -375,10 +389,16 @@ define([
         instance._cueEmitter = new CueEmitter(instance);
       }
 
-      // TODO: Deprecated, use peaks.ready instead.
-      instance.emit('segments.ready');
+      /*
+        Account for a race condition when supplying local peak
+        data where it emits before the listeners can attach
+      */
+      setTimeout(function() {
+        // TODO: Deprecated, use peaks.ready instead.
+        instance.emit('segments.ready');
 
-      instance.emit('peaks.ready');
+        instance.emit('peaks.ready');
+      }, 0);
 
       if (callback) {
         callback(null, instance);
@@ -498,6 +518,15 @@ define([
    */
 
   /**
+   * Local waveform data options for [Peaks.setSource]{@link Peaks#setSource}.
+   *
+   * @typedef {Object} LocalWaveformDataOptions
+   * @global
+   * @property {ArrayBuffer=} arraybuffer
+   * @property {Object=} json
+   */
+
+  /**
    * Web Audio options for [Peaks.setSource]{@link Peaks#setSource}.
    *
    * @typedef {Object} WebAudioOptions
@@ -514,6 +543,7 @@ define([
    * @global
    * @property {String} mediaUrl
    * @property {RemoteWaveformDataOptions=} dataUri
+   * @property {LocalWaveformDataOptions=} rawData
    * @property {WebAudioOptions=} webAudio
    * @property {Boolean=} withCredentials
    * @property {Array<Number>=} zoomLevels

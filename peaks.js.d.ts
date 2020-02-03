@@ -66,10 +66,15 @@ declare module 'peaks.js' {
   type ContainerOptions = SingleContainerOptions | ViewContainerOptions;
 
   interface PreGeneratedWaveformOptions {
-    dataUri: {
+    dataUri?: {
       // URI to waveform data file in binary or JSON
       arraybuffer?: string;
       json?: string;
+    }
+    rawData?: {
+      // raw waveform data file in binary or JSON
+      arraybuffer?: ArrayBuffer;
+      json?: PeaksJsonData;
     }
   }
 
@@ -297,6 +302,16 @@ declare module 'peaks.js' {
   type PeaksInitCallback = (error: Error, peaks?: PeaksInstance) => void;
 
   interface PeaksOptionsWithoutAudioOptions extends RequiredOptions, OptionalOptions {}
+
+  export interface PeaksJsonData {
+    version: number;
+    channels: number;
+    sample_rate: number;
+    samples_per_pixel: number;
+    bits: number;
+    length: number;
+    data: number[];
+  }
 
   export type PeaksOptions = PeaksOptionsWithoutAudioOptions & AudioOptions & ContainerOptions;
   export function init(options: PeaksOptions, callback?: PeaksInitCallback): PeaksInstance;
